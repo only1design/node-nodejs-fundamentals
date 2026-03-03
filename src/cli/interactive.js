@@ -30,6 +30,7 @@ const interactive = () => {
 
         if (handleCommand !== commands.exit) {
             console.log(util.styleText('dim', SEPARATOR))
+            rl.prompt();
         }
     });
     rl.on('close', () => {
