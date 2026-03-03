@@ -1,7 +1,35 @@
+import path from "node:path";
+import {fileURLToPath} from "node:url";
+import * as util from "node:util";
+import fs from "node:fs";
+import {ENTRY_TYPE} from "./const.js";
+import {FSOperationError} from "./error.js";
+import {getEntries} from "./snapshot.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const srcPath = path.dirname(__dirname);
+const workspacePath = path.join(srcPath, 'workspace');
+
 const findByExt = async () => {
-  // Write your code here
-  // Recursively find all files with specific extension
-  // Parse --ext CLI argument (default: .txt)
+    try {
+        await fs.promises.access(workspacePath)
+    } catch (err) {
+        throw new FSOperationError();
+    }
+
+    const { values: {ext} } = util.parseArgs({
+        options: {
+            ext: { type: 'string', default: 'txt' }
+        }
+    });
+
+    const entries = await getEntries(workspacePath);
+    const files = entries
+        .filter(entry => entry.type === ENTRY_TYPE.FILE && path.extname(entry.path) === `.${ext}`)
+        .sort((a, b) => a.path.localeCompare(b.path));
+
+    files.forEach((file) => console.log(file.path))
+
 };
 
 await findByExt();

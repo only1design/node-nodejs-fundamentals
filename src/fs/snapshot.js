@@ -9,7 +9,7 @@ const srcPath = path.dirname(__dirname);
 const workspacePath = path.join(srcPath, 'workspace');
 const snapshotPath = path.join(srcPath, 'snapshot.json');
 
-const getEntries = async (dirPath, recursiveDirPathPointer = dirPath, entries = []) => {
+export const getEntries = async (dirPath, recursiveDirPathPointer = dirPath, entries = []) => {
     const dirents = await fs.promises.readdir(recursiveDirPathPointer);
 
     for (const dirent of dirents) {
