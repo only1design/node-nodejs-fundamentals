@@ -9,24 +9,33 @@ const srcPath = path.dirname(__dirname);
 const workspacePath = path.join(srcPath, 'workspace');
 const snapshotPath = path.join(srcPath, 'snapshot.json');
 
-export const getEntries = async (dirPath, recursiveDirPathPointer = dirPath, entries = []) => {
-    const dirents = await fs.promises.readdir(recursiveDirPathPointer);
+export const getEntries = async (
+    dirPath,
+    options = {parseContent: true},
+    recursiveDirPathPointer = dirPath,
+    entries = []) => {
+    const dirents = await fs.promises.readdir(recursiveDirPathPointer, {withFileTypes: true});
 
     for (const dirent of dirents) {
-        const direntPath = path.join(recursiveDirPathPointer, dirent);
+        const direntPath = path.join(recursiveDirPathPointer, dirent.name);
         const direntRelativePath = path.relative(dirPath, direntPath);
-        const direntStat = await fs.promises.stat(direntPath);
 
-        if (direntStat.isDirectory()) {
+        if (dirent.isDirectory()) {
             entries.push({path: direntRelativePath, type: ENTRY_TYPE.DIRECTORY});
-            await getEntries(dirPath, direntPath, entries);
+            await getEntries(dirPath, options, direntPath, entries);
             continue;
         }
 
-        const fileContentBuffer = await fs.promises.readFile(direntPath);
-        const fileContent = fileContentBuffer.toString('base64');
+        const direntStat = await fs.promises.stat(direntPath);
 
-        entries.push({path: direntRelativePath, type: ENTRY_TYPE.FILE, size: direntStat.size, content: fileContent});
+        const entry = {path: direntRelativePath, type: ENTRY_TYPE.FILE, size: direntStat.size}
+
+        if (options.parseContent) {
+            const fileContentBuffer = await fs.promises.readFile(direntPath);
+            entry.content = fileContentBuffer.toString('base64');
+        }
+
+        entries.push(entry);
     }
 
     return entries;

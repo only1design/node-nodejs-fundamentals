@@ -23,7 +23,8 @@ const findByExt = async () => {
         }
     });
 
-    const entries = await getEntries(workspacePath);
+    // Set parseContent option to false to make the function execution more cost-effective
+    const entries = await getEntries(workspacePath, {parseContent: false});
     const files = entries
         .filter(entry => entry.type === ENTRY_TYPE.FILE && path.extname(entry.path) === `.${ext}`)
         .sort((a, b) => a.path.localeCompare(b.path));
