@@ -2,6 +2,7 @@ import stream from 'node:stream';
 
 const lineNumberer = () => {
     let lineNumber = 1;
+    // Use buffer to process chunks bigger than 64KB
     let buffer = '';
 
     const numberer = new stream.Transform({
