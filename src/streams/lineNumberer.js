@@ -1,8 +1,36 @@
+import stream from 'node:stream';
+
 const lineNumberer = () => {
-  // Write your code here
-  // Read from process.stdin
-  // Use Transform Stream to prepend line numbers
-  // Write to process.stdout
+    let lineNumber = 1;
+    let buffer = '';
+
+    const numberer = new stream.Transform({
+        transform(chunk, encoding, callback) {
+            buffer += chunk.toString();
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+
+            if (lines.length) {
+                const numbered = lines.map(line => `${lineNumber++} | ${line}`).join('\n') + '\n';
+                callback(null, numbered);
+            } else {
+                callback();
+            }
+        },
+        flush(callback) {
+            if (buffer) {
+                callback(null, `${lineNumber} | ${buffer}`);
+            } else {
+                callback();
+            }
+        }
+    });
+
+    stream.promises.pipeline(
+        process.stdin,
+        numberer,
+        process.stdout
+    );
 };
 
 lineNumberer();
