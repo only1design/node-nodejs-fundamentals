@@ -5,7 +5,7 @@ import fs from "node:fs";
 import {ENTRY_TYPE} from "./const.js";
 import {FSOperationError} from "./error.js";
 
-import {getDirEntries} from "../shared/getDirEntities.js";
+import {getDirEntries} from "../shared/getDirEntries.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const srcPath = path.dirname(__dirname);
