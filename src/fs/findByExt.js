@@ -1,15 +1,10 @@
 import path from "node:path";
-import {fileURLToPath} from "node:url";
-import * as util from "node:util";
+import util from "node:util";
 import fs from "node:fs";
-import {ENTRY_TYPE} from "./const.js";
+import {ENTRY_TYPE} from "../shared/const.js";
 import {FSOperationError} from "../shared/error.js";
-
 import {getDirEntries} from "../shared/getDirEntries.js";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const srcPath = path.dirname(__dirname);
-const workspacePath = path.join(srcPath, 'workspace');
+import {workspacePath} from "../shared/paths.js";
 
 const findByExt = async () => {
     try {

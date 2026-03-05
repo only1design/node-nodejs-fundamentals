@@ -1,4 +1,4 @@
-import stream from 'node:stream';
+import stream from 'node:stream/promises';
 import {createLineTransform} from "../shared/getLineTransform.js";
 
 const lineNumberer = () => {
@@ -8,7 +8,7 @@ const lineNumberer = () => {
         line => `${lineNumber++} | ${line}`
     );
 
-    stream.promises.pipeline(
+    stream.pipeline(
         process.stdin,
         numberer,
         process.stdout

@@ -28,6 +28,8 @@ const progress = () => {
             duration: {type: "string", default: "5000"},
             interval: {type: "string", default: "100"},
             length: {type: "string", default: "30"},
+            // The # symbol is special in some shells — it starts a comment, so everything after it gets ignored.
+            // Wrap color in quotes to pass the variable. E.g. --color '#FF00FF'
             color: {type: "string"},
         }
     })

@@ -1,17 +1,12 @@
 import path from "node:path";
-import {fileURLToPath} from "node:url";
 import util from "node:util";
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import {FSOperationError} from "../shared/error.js";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const srcPath = path.dirname(__dirname);
-const partsPath = path.join(srcPath, 'workspace', 'parts');
-const mergedFilePath = path.join(srcPath, 'workspace', 'merged.txt');
+import {mergedFilePath, partsPath} from "../shared/paths.js";
 
 const merge = async () => {
     try {
-        await fs.promises.access(partsPath)
+        await fs.access(partsPath)
     } catch (err) {
         throw new FSOperationError();
     }
@@ -27,7 +22,7 @@ const merge = async () => {
     if (!filesToFindArg) {
         const files = [];
 
-        const dirents = await fs.promises.readdir(partsPath, { withFileTypes: true });
+        const dirents = await fs.readdir(partsPath, { withFileTypes: true });
 
         for (const dirent of dirents) {
             if (!dirent.isDirectory() && path.extname(dirent.name) === '.txt') {
@@ -47,14 +42,14 @@ const merge = async () => {
         const filePath = path.join(partsPath, file);
 
         try {
-            const fileBuffer = await fs.promises.readFile(filePath);
+            const fileBuffer = await fs.readFile(filePath);
             foundFilesBuffers.push(fileBuffer);
         } catch (err) {
             throw new FSOperationError();
         }
     }
 
-    await fs.promises.writeFile(mergedFilePath, Buffer.concat(foundFilesBuffers));
+    await fs.writeFile(mergedFilePath, Buffer.concat(foundFilesBuffers));
 };
 
 await merge();

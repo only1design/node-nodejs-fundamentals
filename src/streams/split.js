@@ -1,29 +1,27 @@
-import stream from 'node:stream';
-import fs from 'node:fs';
+import stream from 'node:stream/promises';
+import {Writable} from 'node:stream';
+import fs from 'node:fs/promises';
+import {createReadStream, createWriteStream} from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import util from 'node:util';
 import {FSOperationError} from "../shared/error.js";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const srcPath = path.dirname(__dirname)
-const sourcePath = path.join(srcPath, 'source.txt');
+import {sourcePath, workspacePath} from "../shared/paths.js";
 
 const getChunkFileName = (index) => `chunk_${index}.txt`
 
 const cleanChunks = async () => {
-    const files = await fs.promises.readdir(srcPath);
+    const files = await fs.readdir(workspacePath);
 
     await Promise.all(
         files
             .filter(f => /^chunk_\d+\.txt$/.test(f))
-            .map(f => fs.promises.unlink(path.join(srcPath, f)))
+            .map(f => fs.unlink(path.join(workspacePath, f)))
     );
 };
 
 const split = async () => {
     try {
-        await fs.promises.access(sourcePath);
+        await fs.access(sourcePath);
     } catch (err) {
         throw new FSOperationError();
     }
@@ -41,9 +39,9 @@ const split = async () => {
     let chunkIndex = 1;
     let lineCount = 0;
     let buffer = '';
-    let writeStream = fs.createWriteStream(path.join(srcPath, getChunkFileName(chunkIndex)));
+    let writeStream = createWriteStream(path.join(workspacePath, getChunkFileName(chunkIndex)));
 
-    const splitter = new stream.Writable({
+    const splitter = new Writable({
         write(chunk, encoding, callback) {
             buffer += chunk.toString();
             const lines = buffer.split('\n');
@@ -55,7 +53,7 @@ const split = async () => {
                     writeStream.end();
                     chunkIndex++;
                     lineCount = 0;
-                    writeStream = fs.createWriteStream(path.join(srcPath, getChunkFileName(chunkIndex)));
+                    writeStream = createWriteStream(path.join(workspacePath, getChunkFileName(chunkIndex)));
                 }
             }
 
@@ -68,8 +66,8 @@ const split = async () => {
         }
     });
 
-    await stream.promises.pipeline(
-        fs.createReadStream(sourcePath),
+    await stream.pipeline(
+        createReadStream(sourcePath),
         splitter
     );
 };

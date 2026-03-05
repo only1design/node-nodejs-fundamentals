@@ -1,5 +1,5 @@
 import path from "node:path";
-import {ENTRY_TYPE} from "../fs/const.js";
+import {ENTRY_TYPE} from "./const.js";
 import fs from "node:fs";
 
 /**

@@ -1,27 +1,21 @@
-import path from "node:path";
-import {fileURLToPath} from "node:url";
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import {FSOperationError} from "../shared/error.js";
 import {getDirEntries} from "../shared/getDirEntries.js";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const srcPath = path.dirname(__dirname);
-const workspacePath = path.join(srcPath, 'workspace');
-const snapshotPath = path.join(srcPath, 'snapshot.json');
+import {snapshotPath, workspacePath} from "../shared/paths.js";
 
 const snapshot = async () => {
     try {
-        await fs.promises.access(workspacePath)
+        await fs.access(workspacePath)
     } catch (err) {
         throw new FSOperationError();
     }
 
     const result = {
-        rootPath: await fs.promises.realpath(workspacePath),
+        rootPath: await fs.realpath(workspacePath),
         entries: await getDirEntries(workspacePath)
     };
 
-    await fs.promises.writeFile(snapshotPath, JSON.stringify(result, null, 2));
+    await fs.writeFile(snapshotPath, JSON.stringify(result, null, 2));
 };
 
 await snapshot();

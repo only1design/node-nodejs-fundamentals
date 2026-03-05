@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import {ENTRY_TYPE} from "../fs/const.js";
+import {ENTRY_TYPE} from "./const.js";
 
 /**
  * Recursively walks a directory and returns a flat depth-first list of all

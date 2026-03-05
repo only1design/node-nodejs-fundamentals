@@ -1,9 +1,6 @@
 import path from "node:path";
-import {fileURLToPath} from "node:url";
-import fs from "node:fs";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const pluginsPath = path.join(__dirname, 'plugins');
+import fs from "node:fs/promises";
+import {pluginsPath} from "../shared/paths.js";
 
 const exit = () => {
     console.log('Plugin not found');
@@ -18,7 +15,7 @@ const dynamic = async () => {
     const pluginPath = path.join(pluginsPath,  `${command}.js`);
 
     try {
-        await fs.promises.access(pluginPath);
+        await fs.access(pluginPath);
     } catch (err) {
         exit()
     }

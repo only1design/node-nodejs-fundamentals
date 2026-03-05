@@ -1,4 +1,4 @@
-import stream from "node:stream";
+import stream from "node:stream/promises";
 import util from "node:util";
 import {createLineTransform} from "../shared/getLineTransform.js";
 
@@ -15,7 +15,7 @@ const filter = () => {
         line => line.includes(pattern) ? line : null
     );
 
-    stream.promises.pipeline(
+    stream.pipeline(
         process.stdin,
         filterer,
         process.stdout

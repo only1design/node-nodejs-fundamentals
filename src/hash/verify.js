@@ -1,29 +1,26 @@
 import path from "node:path";
-import {fileURLToPath} from "node:url";
-import fs from "node:fs";
-import {FSOperationError} from "../shared/error.js";
+import fs from "node:fs/promises";
+import {createReadStream} from "node:fs";
 import crypto from 'node:crypto'
-import * as stream from "node:stream";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const srcPath = path.dirname(__dirname);
-const checksumsPath = path.join(srcPath, 'checksums.json');
+import stream from "node:stream/promises";
+import {FSOperationError} from "../shared/error.js";
+import {checksumsPath, workspacePath} from "../shared/paths.js";
 
 const verify = async () => {
     try {
-        await fs.promises.access(checksumsPath);
+        await fs.access(checksumsPath);
     } catch (err) {
         throw new FSOperationError();
     }
 
-    const checksumsBuffer = await fs.promises.readFile(checksumsPath);
+    const checksumsBuffer = await fs.readFile(checksumsPath);
     const checksums = JSON.parse(checksumsBuffer.toString());
 
     for (const fileName in checksums) {
-        const filePath = path.join(srcPath, fileName);
+        const filePath = path.join(workspacePath, fileName);
 
         try {
-            await fs.promises.access(filePath);
+            await fs.access(filePath);
         } catch (err) {
             console.log(`File ${fileName} listed in checksums.json did not found.`)
             continue;
@@ -31,8 +28,8 @@ const verify = async () => {
 
         const hash = crypto.createHash('sha256');
 
-        await stream.promises.pipeline(
-            fs.createReadStream(path.join(srcPath, fileName)),
+        await stream.pipeline(
+            createReadStream(path.join(workspacePath, fileName)),
             hash,
         );
 

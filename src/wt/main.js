@@ -1,13 +1,7 @@
-import path from "node:path";
-import {fileURLToPath} from "node:url";
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import os from "node:os";
 import {Worker} from 'node:worker_threads';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const srcPath = path.dirname(__dirname);
-const dataPath = path.join(srcPath, 'data.json');
-const workerPath = path.join(__dirname, 'worker.js');
+import {dataPath, workerPath} from "../shared/paths.js";
 
 const splitIntoChunks = (arr, numChunks) => {
     const size = Math.ceil(arr.length / numChunks);
@@ -73,7 +67,7 @@ const kWayMerge = (sortedArrays) => {
 
 const main = async () => {
     const cpuNum = os.cpus().length;
-    const dataBuffer = await fs.promises.readFile(dataPath);
+    const dataBuffer = await fs.readFile(dataPath);
     const data = JSON.parse(dataBuffer.toString());
     const chunks = splitIntoChunks(data, cpuNum);
 
