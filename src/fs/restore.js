@@ -3,6 +3,7 @@ import {fileURLToPath} from "node:url";
 import fs from "node:fs";
 import {ENTRY_TYPE} from "./const.js";
 import {FSOperationError} from "./error.js";
+import {restoreDirEntry} from "../shared/restoreDirEntry.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const srcPath = path.dirname(__dirname);
@@ -22,21 +23,8 @@ const restore = async () => {
         const snapshotString = snapshotBuffer.toString();
         const snapshot = JSON.parse(snapshotString);
 
-        // Sort entries to process directories first
-        snapshot.entries.sort((a, b) => (b.type === ENTRY_TYPE.DIRECTORY) - (a.type === ENTRY_TYPE.DIRECTORY));
-
         for (const entry of snapshot.entries) {
-            const entryPath = path.join(workspacePath, entry.path);
-
-            if (entry.type === ENTRY_TYPE.DIRECTORY) {
-                await fs.promises.mkdir(entryPath, { recursive: true });
-            }
-
-            if (entry.type === ENTRY_TYPE.FILE) {
-                const fileContent = Buffer.from(entry.content, 'base64');
-
-                await fs.promises.writeFile(entryPath, fileContent)
-            }
+            await restoreDirEntry(entry, workspacePath);
         }
     } catch (err) {
         await fs.promises.rm(workspacePath, { recursive: true });

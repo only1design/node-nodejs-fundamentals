@@ -4,7 +4,8 @@ import * as util from "node:util";
 import fs from "node:fs";
 import {ENTRY_TYPE} from "./const.js";
 import {FSOperationError} from "./error.js";
-import {getEntries} from "./snapshot.js";
+
+import {getDirEntries} from "../shared/getDirEntities.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const srcPath = path.dirname(__dirname);
@@ -24,7 +25,7 @@ const findByExt = async () => {
     });
 
     // Set parseContent option to false to make the function execution more cost-effective
-    const entries = await getEntries(workspacePath, {parseContent: false});
+    const entries = await getDirEntries(workspacePath, {parseContent: false, parseSize: false});
     const files = entries
         .filter(entry => entry.type === ENTRY_TYPE.FILE && path.extname(entry.path) === `.${ext}`)
         .sort((a, b) => a.path.localeCompare(b.path));

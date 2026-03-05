@@ -17,7 +17,7 @@ const cleanChunks = async () => {
     await Promise.all(
         files
             .filter(f => /^chunk_\d+\.txt$/.test(f))
-            .map(f => fs.promises.unlink(path.join(__dirname, f)))
+            .map(f => fs.promises.unlink(path.join(srcPath, f)))
     );
 };
 
