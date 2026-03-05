@@ -1,7 +1,7 @@
 import path from "node:path";
 import {fileURLToPath} from "node:url";
 import fs from "node:fs";
-import {FSOperationError} from "../fs/error.js";
+import {FSOperationError} from "../shared/error.js";
 import * as zlib from "node:zlib";
 import stream from "node:stream";
 import {getDirEntries} from "../shared/getDirEntities.js";

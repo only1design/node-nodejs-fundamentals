@@ -2,7 +2,7 @@ import path from "node:path";
 import {fileURLToPath} from "node:url";
 import fs from "node:fs";
 import {ENTRY_TYPE} from "./const.js";
-import {FSOperationError} from "./error.js";
+import {FSOperationError} from "../shared/error.js";
 import {restoreDirEntry} from "../shared/restoreDirEntry.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

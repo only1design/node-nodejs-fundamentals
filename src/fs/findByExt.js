@@ -3,7 +3,7 @@ import {fileURLToPath} from "node:url";
 import * as util from "node:util";
 import fs from "node:fs";
 import {ENTRY_TYPE} from "./const.js";
-import {FSOperationError} from "./error.js";
+import {FSOperationError} from "../shared/error.js";
 
 import {getDirEntries} from "../shared/getDirEntries.js";
 

@@ -1,7 +1,7 @@
 import path from "node:path";
 import {fileURLToPath} from "node:url";
 import fs from "node:fs";
-import {FSOperationError} from "../fs/error.js";
+import {FSOperationError} from "../shared/error.js";
 import crypto from 'node:crypto'
 import * as stream from "node:stream";
 

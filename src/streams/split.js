@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import util from 'node:util';
-import {FSOperationError} from "../fs/error.js";
+import {FSOperationError} from "../shared/error.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const srcPath = path.dirname(__dirname)
