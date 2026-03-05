@@ -65,10 +65,3 @@ Snapshot format reminder:
 ### Child Processes (src/cp)
 
 - `npm run cp:execCommand` - Execute command in child process
-
-## Submission
-
-1. Implement all the required functionality in the corresponding files
-2. Test your solutions using the npm scripts provided
-3. Commit your changes to your forked repository
-4. Submit the link to your repository for review
