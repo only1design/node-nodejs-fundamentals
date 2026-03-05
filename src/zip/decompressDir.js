@@ -23,8 +23,8 @@ const decompressDir = async () => {
 
     const archiveStream = fs.createReadStream(archivePath);
     const archiver = zlib.createBrotliDecompress();
-    const entriesRestorer = createLineTransform(async line => {
-        await restoreDirEntry(JSON.parse(line), decompressedPath);
+    const entriesRestorer = createLineTransform(line => {
+        restoreDirEntry(JSON.parse(line), decompressedPath);
     });
 
     await stream.promises.pipeline(
