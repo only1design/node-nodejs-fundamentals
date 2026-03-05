@@ -1,10 +1,22 @@
+import { spawn } from 'node:child_process';
+
 const execCommand = () => {
-  // Write your code here
-  // Take command from CLI argument
-  // Spawn child process
-  // Pipe child stdout/stderr to parent stdout/stderr
-  // Pass environment variables
-  // Exit with same code as child
+    const command = process.argv[2];
+
+    if (!command) {
+        console.error('No command provided');
+        process.exit(1);
+    }
+
+    const child = spawn(command, {
+        shell: true,
+        stdio: 'inherit',
+        env: process.env,
+    });
+
+    child.on('close', (exitCode) => {
+        process.exit(exitCode);
+    });
 };
 
 execCommand();
