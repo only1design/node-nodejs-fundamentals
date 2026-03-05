@@ -70,6 +70,8 @@ const split = async () => {
         createReadStream(sourcePath),
         splitter
     );
+
+    console.log(`Successfully splited data!`);
 };
 
 split();

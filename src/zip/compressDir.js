@@ -35,6 +35,8 @@ const compressDir = async () => {
         archiver,
         destStream
     )
+
+    console.log("Successfully compressed!")
 };
 
 await compressDir();

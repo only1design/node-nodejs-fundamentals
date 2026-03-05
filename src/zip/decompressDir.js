@@ -26,6 +26,8 @@ const decompressDir = async () => {
         archiver,
         entriesRestorer
     );
+
+    console.log("Successfully decompressed!")
 };
 
 await decompressDir();

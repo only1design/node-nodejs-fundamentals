@@ -25,6 +25,7 @@ const restore = async () => {
         throw err;
     }
 
+    console.log("Successfully restored snapshot!");
 };
 
 await restore();

@@ -16,6 +16,8 @@ const snapshot = async () => {
     };
 
     await fs.writeFile(snapshotPath, JSON.stringify(result, null, 2));
+
+    console.log("Successfully created snapshot!");
 };
 
 await snapshot();

@@ -50,6 +50,8 @@ const merge = async () => {
     }
 
     await fs.writeFile(mergedFilePath, Buffer.concat(foundFilesBuffers));
+
+    console.log(`Successfully merged files!`);
 };
 
 await merge();
