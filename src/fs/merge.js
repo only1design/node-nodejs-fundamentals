@@ -3,6 +3,9 @@ import util from "node:util";
 import fs from "node:fs/promises";
 import {FSOperationError} from "../shared/error.js";
 import {mergedFilePath, partsPath} from "../shared/paths.js";
+import {randomUUID} from "node:crypto";
+import {createReadStream, createWriteStream} from "node:fs";
+import stream from "node:stream/promises";
 
 const merge = async () => {
     try {
@@ -22,7 +25,7 @@ const merge = async () => {
     if (!filesToFindArg) {
         const files = [];
 
-        const dirents = await fs.readdir(partsPath, { withFileTypes: true });
+        const dirents = await fs.readdir(partsPath, {withFileTypes: true});
 
         for (const dirent of dirents) {
             if (!dirent.isDirectory() && path.extname(dirent.name) === '.txt') {
@@ -35,21 +38,25 @@ const merge = async () => {
 
     if (!filesToFind.length) throw new Error("There are no files to merge found.");
 
-    // First, collect the file buffers so that they are written only after all files have been processed without errors.
-    const foundFilesBuffers = [];
+    const tmpPath = `${mergedFilePath}.${randomUUID()}.tmp`;
+    const outputFileStream = createWriteStream(tmpPath);
 
     for (const file of filesToFind) {
         const filePath = path.join(partsPath, file);
 
         try {
-            const fileBuffer = await fs.readFile(filePath);
-            foundFilesBuffers.push(fileBuffer);
+            const inputFileStream = createReadStream(filePath)
+
+            await stream.pipeline(inputFileStream, outputFileStream, {end: false});
         } catch (err) {
+            await fs.rm(tmpPath, {force: true});
             throw new FSOperationError();
         }
     }
 
-    await fs.writeFile(mergedFilePath, Buffer.concat(foundFilesBuffers));
+    outputFileStream.end()
+
+    await fs.rename(tmpPath, mergedFilePath);
 
     console.log(`Successfully merged files!`);
 };
