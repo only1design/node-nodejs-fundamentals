@@ -6,6 +6,7 @@ import path from 'node:path';
 import util from 'node:util';
 import {FSOperationError} from "../shared/error.js";
 import {sourcePath, workspacePath} from "../shared/paths.js";
+import readline from "node:readline";
 
 const getChunkFileName = (index) => `chunk_${index}.txt`
 
@@ -38,40 +39,39 @@ const split = async () => {
 
     let chunkIndex = 1;
     let lineCount = 0;
-    let buffer = '';
     let writeStream = createWriteStream(path.join(workspacePath, getChunkFileName(chunkIndex)));
 
-    const splitter = new Writable({
-        write(chunk, encoding, callback) {
-            buffer += chunk.toString();
-            const lines = buffer.split('\n');
-            buffer = lines.pop();
+    const inputReadStream = createReadStream(sourcePath);
+    const rl = readline.createInterface({ input: inputReadStream, crlfDelay: Infinity });
+    const splitStream = new Writable({
+        objectMode: true,
+        write: (line, _, callback) => {
+            const canContinue = writeStream.write(line + '\n');
 
-            for (const line of lines) {
-                writeStream.write(line + '\n');
-                if (++lineCount >= linesPerChunk) {
-                    writeStream.end();
-                    chunkIndex++;
-                    lineCount = 0;
-                    writeStream = createWriteStream(path.join(workspacePath, getChunkFileName(chunkIndex)));
-                }
+            if (++lineCount >= linesPerChunk) {
+                writeStream.end();
+                chunkIndex++;
+                lineCount = 0;
+                writeStream = createWriteStream(path.join(workspacePath, getChunkFileName(chunkIndex)));
+                callback();
+            } else if (!canContinue) {
+                writeStream.once('drain', callback);
+            } else {
+                callback();
             }
-
-            callback();
         },
         final(callback) {
-            if (buffer) writeStream.write(buffer);
             writeStream.end();
             callback();
         }
-    });
+    })
 
     await stream.pipeline(
-        createReadStream(sourcePath),
-        splitter
+        rl,
+        splitStream
     );
 
-    console.log(`Successfully splited data!`);
+    console.log(`Successfully split data!`);
 };
 
 split();

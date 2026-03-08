@@ -3,9 +3,10 @@ import {createReadStream} from "node:fs";
 import stream from "node:stream/promises";
 import zlib from "node:zlib";
 import {FSOperationError} from "../shared/error.js";
-import {createLineTransform} from "../shared/getLineTransform.js";
 import {restoreDirEntry} from "../shared/restoreDirEntry.js";
 import {archivePath, decompressedPath} from "../shared/paths.js";
+import readline from "node:readline";
+import {Transform} from "node:stream";
 
 const decompressDir = async () => {
     try {
@@ -16,16 +17,17 @@ const decompressDir = async () => {
     }
 
     const archiveStream = createReadStream(archivePath);
-    const archiver = zlib.createBrotliDecompress();
-    const entriesRestorer = createLineTransform(line => {
-        restoreDirEntry(JSON.parse(line), decompressedPath);
+    const decompressor = zlib.createBrotliDecompress();
+    const rl = readline.createInterface({ input: decompressor, crlfDelay: Infinity });
+
+    const entriesRestorer = new Transform({
+        objectMode: true,
+        transform: (line, _, callback) => callback(null, restoreDirEntry(JSON.parse(line), decompressedPath))
     });
 
-    await stream.pipeline(
-        archiveStream,
-        archiver,
-        entriesRestorer
-    );
+    archiveStream.pipe(decompressor);
+
+    await stream.pipeline(rl, entriesRestorer);
 
     console.log("Successfully decompressed!")
 };
