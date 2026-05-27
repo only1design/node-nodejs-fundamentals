@@ -1,8 +1,21 @@
+import stream from 'node:stream/promises';
+import readline from "node:readline";
+import {Transform} from "node:stream";
+
 const lineNumberer = () => {
-  // Write your code here
-  // Read from process.stdin
-  // Use Transform Stream to prepend line numbers
-  // Write to process.stdout
+    let lineNumber = 1;
+
+    const rl = readline.createInterface({input: process.stdin, crlfDelay: Infinity });
+    const numberer = new Transform({
+        objectMode: true,
+        transform: (line, _, callback) => callback(null, `${lineNumber++} | ${line}\n`),
+    });
+
+    stream.pipeline(
+        rl,
+        numberer,
+        process.stdout
+    );
 };
 
 lineNumberer();

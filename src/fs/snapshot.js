@@ -1,9 +1,23 @@
+import fs from "node:fs/promises";
+import {FSOperationError} from "../shared/error.js";
+import {getDirEntries} from "../shared/getDirEntries.js";
+import {snapshotPath, workspacePath} from "../shared/paths.js";
+
 const snapshot = async () => {
-  // Write your code here
-  // Recursively scan workspace directory
-  // Write snapshot.json with:
-  // - rootPath: absolute path to workspace
-  // - entries: flat array of relative paths and metadata
+    try {
+        await fs.access(workspacePath)
+    } catch (err) {
+        throw new FSOperationError();
+    }
+
+    const result = {
+        rootPath: await fs.realpath(workspacePath),
+        entries: await getDirEntries(workspacePath)
+    };
+
+    await fs.writeFile(snapshotPath, JSON.stringify(result, null, 2));
+
+    console.log("Successfully created snapshot!");
 };
 
 await snapshot();
